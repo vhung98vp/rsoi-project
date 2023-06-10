@@ -1,0 +1,39 @@
+statistic:
+  service:
+    port: 8040
+    image:
+      name: vhung98vp/statistic
+      version: "1.1"
+    database:
+      url: "postgres://postgres:postgres@postgres-service:5432/statistics"
+rating:
+  service:
+    port: 8050
+    image:
+      name: vhung98vp/user
+      version: "1.1"
+    database:
+      url: "postgres://postgres:postgres@postgres-service:5432/users"
+library:
+  service:
+    port: 8060
+    image:
+      name: vhung98vp/card
+      version: "1.1"
+    database: 
+      url: "postgres://postgres:postgres@postgres-service:5432/cards"
+reservation:
+  service:
+    port: 8070
+    image:
+      name: vhung98vp/learn
+      version: "1.1"
+    database: 
+      url: "postgres://postgres:postgres@postgres-service:5432/learns"
+gateway:
+  service:
+    port: 8080
+    image:
+      name: vhung98vp/gateway
+      version: "1.1"
+    isGateway: true

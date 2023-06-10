@@ -1,0 +1,95 @@
+version: "3"
+services:
+  postgres:
+    image: library/postgres:13
+    container_name: postgres
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: postgres
+    volumes:
+      - ./create-data.sql:/docker-entrypoint-initdb.d/create-data.sql
+    ports:
+      - "5432:5432"
+
+# TODO добавить сервисы
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: on-failure
+    ports:
+      - "6379:6379"
+      
+  gateway:
+    image: gateway
+    container_name: gateway
+    build: ./gateway/
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user
+      - card
+      - learn
+    environment:
+      STATISTIC_URL: "http://statistic:8040"
+      USER_URL: "http://user:8050"
+      CARD_URL: "http://card:8060"
+      LEARN_URL: "http://learn:8070"
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+      
+  learn:
+    image: learn
+    container_name: learn
+    build: ./learn/
+    ports:
+      - "8070:8070"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgres://postgres:postgres@postgres:5432/learns"
+
+  card:
+    image: card
+    container_name: card
+    build: ./card/
+    ports:
+      - "8060:8060"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgres://postgres:postgres@postgres:5432/cards"
+      GATEWAY_URL: "http://gateway:8080"
+      
+  user:
+    image: user
+    container_name: user
+    build: ./user/
+    ports:
+      - "8050:8050"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgres://postgres:postgres@postgres:5432/users"
+  
+  statistic:
+    image: statistic
+    container_name: statistic
+    build: ./statistic/
+    ports:
+      - "8040:8040"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgres://postgres:postgres@postgres:5432/statistics"
+  
+  # frontend:
+  #   image: frontend
+  #   container_name: frontend
+  #   build: ./frontend/
+  #   ports:
+  #     - "3000:3000"
+
+volumes:
+  db-data:
