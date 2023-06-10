@@ -89,7 +89,12 @@ class UserController {
     static isAdmin = async(req, res, next) => {
         let username = req.headers['x-user-name'];
         const item = await Users.findOne({where: {username}})
-        return res.status(200).json({ admin: item.role == 'ADMIN'})
+        if(item) {
+            return res.status(200).json({ admin: item.role == 'ADMIN'})
+        } else {
+            return res.status(404).json({message: "Item not found"})
+        }
+        
     }
 }
 

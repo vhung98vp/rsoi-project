@@ -39,22 +39,22 @@ export default function Library() {
 
   async function fetchData() {
     let username = getUser()
-    const categoryList = await CategoryService.getAll();
-    const setList = await SetService.getAll(username);
-    let learnedList = []
     console.log(username)
+    const categoryList = await CategoryService.getAll();
+    setCategories([{id: 0, name: 'All'}, ...categoryList])
     if(username != ''){
+      const setList = await SetService.getAll(username);
+      let learnedList = []
       learnedList = await SetService.getLearned();
       console.log(learnedList)
       learnedList = learnedList.filter(item => {return item.username != username})
       let noticeList = await LearnService.getNotice();
       console.log(noticeList)
       setNoticedSets(noticeList.map(item => {return item.setUid}))
+      let fullList = setList.concat(learnedList)
+      setSets(fullList)
+      setSelectedSets(fullList)
     }
-    setCategories([{id: 0, name: 'All'}, ...categoryList])
-    let fullList = setList.concat(learnedList)
-    setSets(fullList)
-    setSelectedSets(fullList)
   }
 
   const handleChangeFilter = (event) => {
